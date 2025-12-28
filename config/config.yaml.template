@@ -1,0 +1,117 @@
+app:
+  version_check_url: "https://raw.githubusercontent.com/sansan0/TrendRadar/refs/heads/master/version"
+  show_version_update: true
+  timezone: "Asia/Shanghai"
+
+# --- [新增] LLM AI 配置 ---
+llm:
+  enable: true
+  provider: "google"
+  # 2025年最新模型名称。如果部署报错 400/404，请回退为 "gemini-2.0-flash-exp"
+  model: "gemini-3-flash-preview"
+  # 密钥将从 Render 环境变量注入
+  api_key: "${GEMINI_API_KEY}"
+  base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+  concurrency: 3
+
+# --- 存储配置 ---
+storage:
+  # Render 免费版重启会丢失数据，local 仅做临时缓存
+  backend: "local"
+  formats:
+    sqlite: true
+    txt: false
+    html: false
+  local:
+    data_dir: "output"
+    retention_days: 1
+  remote:
+    retention_days: 0
+  pull:
+    enabled: false
+    days: 7
+
+# --- 爬虫配置 ---
+crawler:
+  # 适当增加间隔，适应免费容器性能
+  request_interval: 2000
+  enable_crawler: true
+  use_proxy: false
+  default_proxy: "http://127.0.0.1:10801"
+
+# --- 报告配置 ---
+report:
+  mode: "current"
+  rank_threshold: 5
+  sort_by_position_first: false
+  max_news_per_keyword: 0
+  reverse_content_order: false
+
+# --- 通知配置 ---
+notification:
+  enable_notification: true
+  message_batch_size: 4000
+  dingtalk_batch_size: 20000
+  feishu_batch_size: 30000
+  bark_batch_size: 4000
+  slack_batch_size: 4000
+  batch_send_interval: 3
+  feishu_message_separator: "━━━━━━━━━━━━━━━━━━━"
+  max_accounts_per_channel: 3
+
+  push_window:
+    enabled: false
+    time_range:
+      start: "20:00"
+      end: "22:00"
+    once_per_day: true
+
+  webhooks:
+    # --- [修改] Bark URL 从环境变量注入 ---
+    bark_url: "${BARK_URL}"
+    # 其他 Webhook 留空即可
+    feishu_url: ""
+    dingtalk_url: ""
+    wework_url: ""
+    wework_msg_type: "markdown"
+    telegram_bot_token: ""
+    telegram_chat_id: ""
+    email_from: ""
+    email_password: ""
+    email_to: ""
+    email_smtp_server: ""
+    email_smtp_port: ""
+    ntfy_server_url: "https://ntfy.sh"
+    ntfy_topic: ""
+    ntfy_token: ""
+    slack_webhook_url: ""
+
+# --- 权重与平台 ---
+weight:
+  rank_weight: 0.6
+  frequency_weight: 0.3
+  hotness_weight: 0.1
+
+platforms:
+  - id: "toutiao"
+    name: "今日头条"
+  - id: "baidu"
+    name: "百度热搜"
+  - id: "wallstreetcn-hot"
+    name: "华尔街见闻"
+  - id: "thepaper"
+    name: "澎湃新闻"
+  - id: "bilibili-hot-search"
+    name: "bilibili 热搜"
+  - id: "cls-hot"
+    name: "财联社热门"
+  - id: "ifeng"
+    name: "凤凰网"
+  - id: "tieba"
+    name: "贴吧"
+  - id: "weibo"
+    name: "微博"
+  - id: "douyin"
+    name: "抖音"
+  - id: "zhihu"
+    name: "知乎"
