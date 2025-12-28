@@ -14,22 +14,36 @@ llm:
   base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
   concurrency: 3
 
-# --- 存储配置 ---
+# 存储配置
 storage:
-  # Render 免费版重启会丢失数据，local 仅做临时缓存
-  backend: "local"
+  # --- 关键修改 1: 启用远程存储 ---
+  # 设为 auto 或 remote，配合环境变量使用
+  backend: "remote"
+
   formats:
     sqlite: true
     txt: false
     html: false
+
   local:
     data_dir: "output"
-    retention_days: 1
+    retention_days: 1 # 本地只留1天做缓存即可
+
+  # --- 关键修改 2: 远程存储配置 ---
+  # 我们将使用环境变量注入这些敏感信息
   remote:
-    retention_days: 0
+    retention_days: 30 # 云端保留30天历史
+    endpoint_url: "${S3_ENDPOINT}"
+    bucket_name: "${S3_BUCKET}"
+    access_key_id: "${S3_ACCESS_KEY}"
+    secret_access_key: "${S3_SECRET_KEY}"
+    region: "auto"
+
+  # --- 关键修改 3: 启动时拉取数据 ---
+  # 这非常重要！Render 重启后是空的，必须先从云端把旧数据拉下来，MCP 才有话可说
   pull:
-    enabled: false
-    days: 7
+    enabled: true
+    days: 7 # 拉取最近7天的数据
 
 # --- 爬虫配置 ---
 crawler:
